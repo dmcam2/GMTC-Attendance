@@ -5,49 +5,75 @@
 </head>
 <body>
 
-  <h2>Mark Attendance</h2>
+<h2>Class Attendance</h2>
 
-  <form id="rollForm">
-    <label>Student Name:</label><br>
-    <input type="text" id="name" required><br><br>
+<form id="attendanceForm">
+  <div id="studentList"></div>
+  <br>
+  <button type="submit">Submit Attendance</button>
+</form>
 
-    <label>Status:</label><br>
-    <select id="status">
-      <option value="Present">Present</option>
-      <option value="Absent">Absent</option>
-      <option value="Late">Late</option>
-    </select><br><br>
+<p id="response"></p>
 
-    <button type="submit">Submit</button>
-  </form>
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbxNmvFmCZEfqmuqUu46bgPFnZJxk-bsHJVnrBF62FKeO6KtHkYV2_ZUIDvj5U9Tl5fE/exec";
 
-  <p id="response"></p>
+// Load students
+fetch(scriptURL)
+  .then(res => res.json())
+  .then(students => {
+    const container = document.getElementById("studentList");
 
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwlSVt87Y2hwb7-c9M2uKOk6K98ZxqHbw2KSEMlZMevvR5jgvfli-zz4Td7xk96skW4/exec";
+    students.forEach((student, index) => {
+      const div = document.createElement("div");
 
-    document.getElementById("rollForm").addEventListener("submit", function(e) {
-      e.preventDefault();
+      div.innerHTML = `
+        <strong>${student}</strong><br>
+        <label>
+          <input type="radio" name="status_${index}" value="Present" required> Present
+        </label>
+        <label>
+          <input type="radio" name="status_${index}" value="Absent"> Absent
+        </label>
+        <br><br>
+      `;
 
-      const data = {
-        name: document.getElementById("name").value,
-        status: document.getElementById("status").value
-      };
-
-      fetch(scriptURL, {
-        method: "POST",
-        body: JSON.stringify(data)
-      })
-      .then(res => res.json())
-      .then(response => {
-        document.getElementById("response").innerText = "Submitted!";
-        document.getElementById("rollForm").reset();
-      })
-      .catch(error => {
-        document.getElementById("response").innerText = "Error submitting.";
-      });
+      container.appendChild(div);
     });
-  </script>
+  });
+
+// Submit attendance
+document.getElementById("attendanceForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const studentDivs = document.querySelectorAll("#studentList div");
+  const records = [];
+
+  studentDivs.forEach((div, index) => {
+    const name = div.querySelector("strong").innerText;
+    const selected = document.querySelector(`input[name="status_${index}"]:checked`);
+
+    if (selected) {
+      records.push({
+        name: name,
+        status: selected.value
+      });
+    }
+  });
+
+  fetch(scriptURL, {
+    method: "POST",
+    body: JSON.stringify({ records: records })
+  })
+  .then(res => res.json())
+  .then(() => {
+    document.getElementById("response").innerText = "Attendance submitted!";
+  })
+  .catch(() => {
+    document.getElementById("response").innerText = "Error submitting.";
+  });
+});
+</script>
 
 </body>
 </html>
