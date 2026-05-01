@@ -1,76 +1,119 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Dance Studio Attendance</title>
+  <title>Roll Marking</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
       font-family: Arial;
-      margin: 20px;
+      margin: 12px;
+      background: #f5f5f5;
     }
 
     h2 {
-      margin-bottom: 10px;
+      margin: 10px 0;
     }
 
     select, input {
-      padding: 5px;
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
       margin-bottom: 10px;
     }
 
     .student {
-      margin-bottom: 8px;
-      padding: 8px;
-      border-bottom: 1px solid #ddd;
+      background: white;
+      padding: 14px;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
-    button {
-      margin-left: 10px;
-      padding: 5px 10px;
-      cursor: pointer;
+    .name {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 12px 14px;
       border: none;
-      border-radius: 4px;
+      border-radius: 10px;
+      font-size: 14px;
+      min-width: 70px;
+      text-align: center;
     }
 
     .present {
-      background-color: #4CAF50;
-      color: white;
+      background: #e0f7e9;
+      color: #1b7f3b;
     }
 
     .absent {
-      background-color: #f44336;
+      background: #ffe5e5;
+      color: #b30000;
+    }
+
+    .selected-present {
+      background: #2ecc71 !important;
+      color: white !important;
+    }
+
+    .selected-absent {
+      background: #e74c3c !important;
+      color: white !important;
+    }
+
+    .sticky {
+      position: sticky;
+      bottom: 0;
+      background: white;
+      padding: 12px;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      margin-top: 20px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background: #3498db;
       color: white;
     }
 
-    .selected {
-      outline: 3px solid black;
-    }
-
-    .controls {
-      margin-bottom: 20px;
+    .container {
+      padding-bottom: 100px;
     }
   </style>
 </head>
 
 <body>
 
-<h2>Attendance Roll</h2>
+<h2>Roll Marking</h2>
 
-<div class="controls">
-  <label><strong>Select Session:</strong></label><br>
-  <select id="sessionSelect"></select>
+<label>Session</label>
+<select id="sessionSelect"></select>
 
-  <br><br>
+<label>Date</label>
+<input type="date" id="dateInput">
 
-  <label><strong>Select Date:</strong></label><br>
-  <input type="date" id="dateInput">
+<div class="container" id="studentList"></div>
 
-  <br><br>
-
-  <button onclick="submitAttendance()">Submit Attendance</button>
+<div class="sticky">
+  <button class="submit-btn" onclick="submitAttendance()">
+    Submit Attendance
+  </button>
 </div>
-
-<div id="studentList"></div>
 
 <p id="response"></p>
 
@@ -81,10 +124,10 @@ let sessions = [];
 let selectedSession = null;
 let attendance = {};
 
-// Set today's date automatically
+// auto date
 document.getElementById("dateInput").valueAsDate = new Date();
 
-// Load sessions from Google Sheets
+// load sessions
 fetch(scriptURL)
   .then(res => res.json())
   .then(data => {
@@ -92,19 +135,18 @@ fetch(scriptURL)
 
     const select = document.getElementById("sessionSelect");
 
-    sessions.forEach((s, index) => {
-      const option = document.createElement("option");
-      option.value = index;
-      option.textContent = `${s.day} - ${s.level} (${s.activity})`;
-      select.appendChild(option);
+    sessions.forEach((s, i) => {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${s.day} - ${s.level} (${s.activity})`;
+      select.appendChild(opt);
     });
 
     select.addEventListener("change", loadStudents);
 
-    loadStudents(); // load first session automatically
+    loadStudents();
   });
 
-// Load students for selected session
 function loadStudents() {
   const index = document.getElementById("sessionSelect").value;
   selectedSession = sessions[index];
@@ -113,63 +155,76 @@ function loadStudents() {
   container.innerHTML = "";
   attendance = {};
 
-  selectedSession.students.forEach(student => {
-    attendance[student] = "Present"; // default
+  selectedSession.students.forEach(name => {
+    attendance[name] = "Present";
 
     const div = document.createElement("div");
     div.className = "student";
 
     div.innerHTML = `
-      <strong>${student}</strong>
-      <button class="present selected" onclick="mark(this, '${student}', 'Present')">✔</button>
-      <button class="absent" onclick="mark(this, '${student}', 'Absent')">✖</button>
+      <div class="name">${name}</div>
+
+      <div class="btn-group">
+        <button class="btn present selected-present"
+          onclick="mark(this,'${name}','Present')">Present</button>
+
+        <button class="btn absent"
+          onclick="mark(this,'${name}','Absent')">Absent</button>
+      </div>
     `;
 
     container.appendChild(div);
   });
 }
 
-// Mark attendance
-function mark(button, name, status) {
+function mark(btn, name, status) {
   attendance[name] = status;
 
-  const parent = button.parentElement;
-  const buttons = parent.querySelectorAll("button");
+  const parent = btn.parentElement;
 
-  buttons.forEach(btn => btn.classList.remove("selected"));
-  button.classList.add("selected");
+  const presentBtn = parent.querySelector(".present");
+  const absentBtn = parent.querySelector(".absent");
+
+  if (status === "Present") {
+    presentBtn.classList.add("selected-present");
+    absentBtn.classList.remove("selected-absent");
+  } else {
+    absentBtn.classList.add("selected-absent");
+    presentBtn.classList.remove("selected-present");
+  }
 }
 
-// Submit to Google Sheets
 function submitAttendance() {
   const date = document.getElementById("dateInput").value;
 
   if (!date) {
-    alert("Please select a date");
+    alert("Select a date");
     return;
   }
 
   const records = Object.keys(attendance).map(name => ({
-    name: name,
+    name,
     status: attendance[name]
   }));
 
   fetch(scriptURL, {
     method: "POST",
     body: JSON.stringify({
-      date: date,
+      date,
       day: selectedSession.day,
       level: selectedSession.level,
       activity: selectedSession.activity,
-      records: records
+      records
     })
   })
   .then(res => res.json())
   .then(() => {
-    document.getElementById("response").innerText = "Attendance saved successfully!";
+    document.getElementById("response").innerText =
+      "Attendance saved successfully!";
   })
   .catch(() => {
-    document.getElementById("response").innerText = "Error submitting attendance.";
+    document.getElementById("response").innerText =
+      "Error saving attendance.";
   });
 }
 </script>
