@@ -1,307 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Responsive Website Template</title>
-  <style>
-    :root {
-      --bg: #f8fafc;
-      --surface: #ffffff;
-      --text: #0f172a;
-      --muted: #475569;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --border: #e2e8f0;
-      --shadow: 0 16px 38px rgba(15, 23, 42, 0.08);
-      --radius: 14px;
-      --container: 1120px;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    img {
-      max-width: 100%;
-      display: block;
-    }
-
-    .container {
-      width: min(100% - 2rem, var(--container));
-      margin-inline: auto;
-    }
-
-    .site-header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: color-mix(in srgb, #ffffff 85%, transparent);
-      backdrop-filter: blur(6px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav {
-      min-height: 4.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
-
-    .logo {
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      color: var(--text);
-    }
-
-    .menu {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .menu a {
-      color: var(--muted);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-
-    .menu a:hover {
-      color: var(--text);
-    }
-
-    .btn {
-      border: 0;
-      background: var(--primary);
-      color: white;
-      padding: 0.65rem 1rem;
-      border-radius: 999px;
-      font-weight: 700;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.2s ease;
-    }
-
-    .btn:hover {
-      background: var(--primary-hover);
-    }
-
-    .hero {
-      padding: 4rem 0 3rem;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 1fr;
-      gap: 2rem;
-      align-items: center;
-    }
-
-    .hero h1 {
-      margin: 0 0 1rem;
-      line-height: 1.15;
-      font-size: clamp(1.9rem, 4vw, 3.2rem);
-    }
-
-    .hero p {
-      margin: 0 0 1.5rem;
-      color: var(--muted);
-      max-width: 55ch;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .btn-secondary {
-      background: #e2e8f0;
-      color: #0f172a;
-    }
-
-    .btn-secondary:hover {
-      background: #cbd5e1;
-    }
-
-    .hero-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.1rem;
-      box-shadow: var(--shadow);
-    }
-
-    .hero-card .mock {
-      aspect-ratio: 4 / 3;
-      border-radius: 10px;
-      background: linear-gradient(120deg, #dbeafe 0%, #bfdbfe 35%, #e2e8f0 100%);
-      border: 1px solid #cbd5e1;
-    }
-
-    .section {
-      padding: 2.25rem 0;
-    }
-
-    .section h2 {
-      margin-top: 0;
-      font-size: clamp(1.35rem, 3vw, 2rem);
-    }
-
-    .section p.lead {
-      margin-top: -0.2rem;
-      color: var(--muted);
-      max-width: 64ch;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1rem;
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1rem;
-      box-shadow: var(--shadow);
-    }
-
-    .card h3 {
-      margin: 0 0 0.5rem;
-      font-size: 1.05rem;
-    }
-
-    .card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .site-footer {
-      margin-top: 2rem;
-      border-top: 1px solid var(--border);
-      padding: 1.2rem 0 2rem;
-      color: var(--muted);
-      font-size: 0.9rem;
-      text-align: center;
-    }
-
-    @media (max-width: 860px) {
-      .hero {
-        padding-top: 2.75rem;
-      }
-
-      .hero-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .cards {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 600px) {
-      .nav {
-        align-items: flex-start;
-        padding: 0.7rem 0;
-      }
-
-      .menu {
-        width: 100%;
-        justify-content: flex-start;
-      }
-
-      .cards {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+  <title>Roll Marking System</title>
 </head>
 <body>
-  <header class="site-header">
-    <div class="container nav">
-      <a class="logo" href="#">YOUR BRAND</a>
-      <nav class="menu" aria-label="Primary navigation">
-        <a href="#features">Features</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
-        <a class="btn" href="#">Get Started</a>
-      </nav>
-    </div>
-  </header>
 
-  <main>
-    <section class="hero">
-      <div class="container hero-grid">
-        <div>
-          <h1>Build fast with this responsive starter template</h1>
-          <p>
-            A clean, mobile-friendly website shell with a sticky header, hero area, feature cards, and
-            simple utility classes you can customize for portfolios, business sites, or product pages.
-          </p>
-          <div class="hero-actions">
-            <a class="btn" href="#features">Explore Features</a>
-            <a class="btn btn-secondary" href="#">Live Demo</a>
-          </div>
-        </div>
+  <h2>Mark Attendance</h2>
 
-        <aside class="hero-card" aria-label="Template preview card">
-          <div class="mock"></div>
-        </aside>
-      </div>
-    </section>
+  <form id="rollForm">
+    <label>Student Name:</label><br>
+    <input type="text" id="name" required><br><br>
 
-    <section class="section" id="features">
-      <div class="container">
-        <h2>Core sections included</h2>
-        <p class="lead">Use these blocks as-is or replace content quickly to fit your project.</p>
-        <div class="cards">
-          <article class="card">
-            <h3>Responsive layout</h3>
-            <p>Grid and flex patterns adapt from desktop to tablet and mobile breakpoints.</p>
-          </article>
-          <article class="card">
-            <h3>Accessible defaults</h3>
-            <p>Semantic structure with descriptive labels and readable contrast built in.</p>
-          </article>
-          <article class="card">
-            <h3>Easy customization</h3>
-            <p>Design tokens in <code>:root</code> help you change colors, spacing, and radius quickly.</p>
-          </article>
-        </div>
-      </div>
-    </section>
+    <label>Status:</label><br>
+    <select id="status">
+      <option value="Present">Present</option>
+      <option value="Absent">Absent</option>
+      <option value="Late">Late</option>
+    </select><br><br>
 
-    <section class="section" id="about">
-      <div class="container">
-        <h2>About this template</h2>
-        <p class="lead">
-          This single-file template is intentionally lightweight, making it a practical starting point for
-          static sites and prototypes.
-        </p>
-      </div>
-    </section>
-  </main>
+    <button type="submit">Submit</button>
+  </form>
 
-  <footer class="site-footer" id="contact">
-    <div class="container">© 2026 Your Brand — Responsive Website Template</div>
-  </footer>
+  <p id="response"></p>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwlSVt87Y2hwb7-c9M2uKOk6K98ZxqHbw2KSEMlZMevvR5jgvfli-zz4Td7xk96skW4/exec";
+
+    document.getElementById("rollForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const data = {
+        name: document.getElementById("name").value,
+        status: document.getElementById("status").value
+      };
+
+      fetch(scriptURL, {
+        method: "POST",
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(response => {
+        document.getElementById("response").innerText = "Submitted!";
+        document.getElementById("rollForm").reset();
+      })
+      .catch(error => {
+        document.getElementById("response").innerText = "Error submitting.";
+      });
+    });
+  </script>
+
 </body>
 </html>
