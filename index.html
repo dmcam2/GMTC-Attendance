@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="eng">
 <head>
   <title>Roll Marking System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,7 +42,9 @@
     .present { background: #2ecc71; color: white; }
     .absent { background: #e74c3c; color: white; }
 
-    .container { padding-bottom: 100px; }
+    .container {
+      padding-bottom: 100px;
+    }
 
     .sticky {
       position: sticky;
@@ -120,7 +122,7 @@
 </div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbxyOhzSWzCOcYPQ-86YqLondQ4wvKI7NNtGf2y5pL94T-mU5rghR-hhfz7aBj9-x1_U/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbw2mwIb2qx5I1IbmGBuhpbXqyHpVgzLEz2xO-gghQttAC8vyldpmgV3lRBzuTghcH7x/exec";
 
 let sessions = [];
 let selectedSession = null;
@@ -144,6 +146,11 @@ fetch(scriptURL)
 
     select.addEventListener("change", loadStudents);
     loadStudents();
+  })
+  .catch(err => {
+    document.getElementById("response").innerText =
+      "Failed to load sessions.";
+    console.error(err);
   });
 
 // LOAD STUDENTS
@@ -176,7 +183,7 @@ function loadStudents() {
   });
 }
 
-// MARK
+// MARK ATTENDANCE
 function mark(name, status) {
   attendance[name] = status;
 }
@@ -190,6 +197,9 @@ function submitAttendance() {
 
   fetch(scriptURL, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({
       date: selectedSession.date,
       day: selectedSession.day,
@@ -198,8 +208,20 @@ function submitAttendance() {
       records
     })
   })
-  .then(() => showModal())
-  .catch(() => alert("Error submitting"));
+  .then(res => res.json())
+  .then(data => {
+    if (data.result === "success") {
+      showModal();
+    } else {
+      document.getElementById("response").innerText =
+        data.message || "Error submitting";
+    }
+  })
+  .catch(err => {
+    document.getElementById("response").innerText =
+      "Submission failed.";
+    console.error(err);
+  });
 }
 
 // MODAL
