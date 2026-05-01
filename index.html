@@ -1,78 +1,177 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Roll Marking System</title>
+  <title>Dance Studio Attendance</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      margin: 20px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    select, input {
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    .student {
+      margin-bottom: 8px;
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 5px 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+    }
+
+    .present {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .absent {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .selected {
+      outline: 3px solid black;
+    }
+
+    .controls {
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
+
 <body>
 
-<h2>Class Attendance</h2>
+<h2>Attendance Roll</h2>
 
-<form id="attendanceForm">
-  <div id="studentList"></div>
-  <br>
-  <button type="submit">Submit Attendance</button>
-</form>
+<div class="controls">
+  <label><strong>Select Session:</strong></label><br>
+  <select id="sessionSelect"></select>
+
+  <br><br>
+
+  <label><strong>Select Date:</strong></label><br>
+  <input type="date" id="dateInput">
+
+  <br><br>
+
+  <button onclick="submitAttendance()">Submit Attendance</button>
+</div>
+
+<div id="studentList"></div>
 
 <p id="response"></p>
 
 <script>
 const scriptURL = "https://script.google.com/macros/s/AKfycbxNmvFmCZEfqmuqUu46bgPFnZJxk-bsHJVnrBF62FKeO6KtHkYV2_ZUIDvj5U9Tl5fE/exec";
 
-// Load students
+let sessions = [];
+let selectedSession = null;
+let attendance = {};
+
+// Set today's date automatically
+document.getElementById("dateInput").valueAsDate = new Date();
+
+// Load sessions from Google Sheets
 fetch(scriptURL)
   .then(res => res.json())
-  .then(students => {
-    const container = document.getElementById("studentList");
+  .then(data => {
+    sessions = data;
 
-    students.forEach((student, index) => {
-      const div = document.createElement("div");
+    const select = document.getElementById("sessionSelect");
 
-      div.innerHTML = `
-        <strong>${student}</strong><br>
-        <select name="status_${index}" required>
-          <option value="">-- Select --</option>
-          <option value="Present">Present</option>
-          <option value="Absent">Absent</option>
-        </select>
-        <br><br>
-      `;
-
-      container.appendChild(div);
+    sessions.forEach((s, index) => {
+      const option = document.createElement("option");
+      option.value = index;
+      option.textContent = `${s.day} - ${s.level} (${s.activity})`;
+      select.appendChild(option);
     });
+
+    select.addEventListener("change", loadStudents);
+
+    loadStudents(); // load first session automatically
   });
 
-// Submit attendance
-document.getElementById("attendanceForm").addEventListener("submit", function(e) {
-  e.preventDefault();
+// Load students for selected session
+function loadStudents() {
+  const index = document.getElementById("sessionSelect").value;
+  selectedSession = sessions[index];
 
-  const studentDivs = document.querySelectorAll("#studentList div");
-  const records = [];
+  const container = document.getElementById("studentList");
+  container.innerHTML = "";
+  attendance = {};
 
-  studentDivs.forEach((div, index) => {
-    const name = div.querySelector("strong").innerText;
-    const status = div.querySelector("select").value;
+  selectedSession.students.forEach(student => {
+    attendance[student] = "Present"; // default
 
-    if (status !== "") {
-      records.push({
-        name: name,
-        status: status
-      });
-    }
+    const div = document.createElement("div");
+    div.className = "student";
+
+    div.innerHTML = `
+      <strong>${student}</strong>
+      <button class="present selected" onclick="mark(this, '${student}', 'Present')">✔</button>
+      <button class="absent" onclick="mark(this, '${student}', 'Absent')">✖</button>
+    `;
+
+    container.appendChild(div);
   });
+}
+
+// Mark attendance
+function mark(button, name, status) {
+  attendance[name] = status;
+
+  const parent = button.parentElement;
+  const buttons = parent.querySelectorAll("button");
+
+  buttons.forEach(btn => btn.classList.remove("selected"));
+  button.classList.add("selected");
+}
+
+// Submit to Google Sheets
+function submitAttendance() {
+  const date = document.getElementById("dateInput").value;
+
+  if (!date) {
+    alert("Please select a date");
+    return;
+  }
+
+  const records = Object.keys(attendance).map(name => ({
+    name: name,
+    status: attendance[name]
+  }));
 
   fetch(scriptURL, {
     method: "POST",
-    body: JSON.stringify({ records: records })
+    body: JSON.stringify({
+      date: date,
+      day: selectedSession.day,
+      level: selectedSession.level,
+      activity: selectedSession.activity,
+      records: records
+    })
   })
   .then(res => res.json())
   .then(() => {
-    document.getElementById("response").innerText = "Attendance submitted!";
-    document.getElementById("attendanceForm").reset();
+    document.getElementById("response").innerText = "Attendance saved successfully!";
   })
   .catch(() => {
-    document.getElementById("response").innerText = "Error submitting.";
+    document.getElementById("response").innerText = "Error submitting attendance.";
   });
-});
+}
 </script>
 
 </body>
