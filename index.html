@@ -1,79 +1,67 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Musical Theatre Attendance</title>
 
-    .status-btn {
-      padding: 10px 16px;
-      border-radius: 8px;
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    header {
+      background: #1a237e;
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    .top-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    select,
+    input,
+    button {
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      background: #3949ab;
+      color: white;
       border: none;
-      font-weight: bold;
+      cursor: pointer;
     }
 
-    .present {
-      background: #43a047;
-      color: white;
+    button:hover {
+      background: #283593;
     }
 
-    .absent {
-      background: #e53935;
-      color: white;
-    }
-
-    .late {
-      background: #fb8c00;
-      color: white;
-    }
-
-    .selected {
-      outline: 3px solid black;
-    }
-
-    #saveBtn {
-      width: 100%;
-      margin-top: 20px;
+    .student-card {
+      background: white;
       padding: 15px;
-      font-size: 18px;
-    }
-
-    #message {
-      margin-top: 20px;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-
-<div class="container">
-
-  <header>
-    <h1>Musical Theatre Attendance</h1>
-    <p>Roll Marking System</p>
-  </header>
-
-  <div class="top-controls">
-
-    <select id="classSelect">
-      <option value="">Select Class</option>
-    </select>
-
-    <input type="date" id="attendanceDate">
-
-    <button id="loadBtn">Load Roll</button>
-
-  </div>
-
-  <div id="studentList"></div>
-
-  <button id="saveBtn">Save Attendance</button>
-
-  <div id="message"></div>
-
-</div>
-
-<script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbzLP3GhS_PuwaDiz65nev44PlX1nRsaT-PozdCBoXOGbtHsXTfifGIoAep_2Pb2UJg/exec';
-
-const classSelect = document.getElementById('classSelect');
-const loadBtn = document.getElementById('loadBtn');
-const studentList = document.getElementById('studentList');
-const saveBtn = document.getElementById('saveBtn');
-const attendanceDate = document.getElementById('attendanceDate');
+      border-radius: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
 </html>
