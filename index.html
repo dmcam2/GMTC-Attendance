@@ -1,60 +1,79 @@
 <!DOCTYPE html>
 
-        button.classList.add('selected');
+    .status-btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+    }
 
-        if (button.textContent === 'P') {
-          student.status = 'Present';
-        }
+    .present {
+      background: #43a047;
+      color: white;
+    }
 
-        if (button.textContent === 'A') {
-          student.status = 'Absent';
-        }
+    .absent {
+      background: #e53935;
+      color: white;
+    }
 
-        if (button.textContent === 'L') {
-          student.status = 'Late';
-        }
+    .late {
+      background: #fb8c00;
+      color: white;
+    }
 
-      });
+    .selected {
+      outline: 3px solid black;
+    }
 
-    });
+    #saveBtn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      font-size: 18px;
+    }
 
-    studentList.appendChild(card);
-  });
-}
+    #message {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
 
-async function saveAttendance() {
+<div class="container">
 
-  if (attendanceData.length === 0) {
-    alert('Please load a class first');
-    return;
-  }
+  <header>
+    <h1>Musical Theatre Attendance</h1>
+    <p>Roll Marking System</p>
+  </header>
 
-  const payload = {
-    action: 'saveAttendance',
-    className: classSelect.value,
-    date: attendanceDate.value,
-    attendance: attendanceData
-  };
+  <div class="top-controls">
 
-  const response = await fetch(API_URL, {
-    method: 'POST',
-    body: JSON.stringify(payload)
-  });
+    <select id="classSelect">
+      <option value="">Select Class</option>
+    </select>
 
-  const result = await response.json();
+    <input type="date" id="attendanceDate">
 
-  if (result.success) {
-    message.textContent = 'Attendance saved successfully';
-  } else {
-    message.textContent = 'Error saving attendance';
-  }
-}
+    <button id="loadBtn">Load Roll</button>
 
-loadBtn.addEventListener('click', loadStudents);
-saveBtn.addEventListener('click', saveAttendance);
+  </div>
 
-loadClasses();
-</script>
+  <div id="studentList"></div>
 
-</body>
+  <button id="saveBtn">Save Attendance</button>
+
+  <div id="message"></div>
+
+</div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbzLP3GhS_PuwaDiz65nev44PlX1nRsaT-PozdCBoXOGbtHsXTfifGIoAep_2Pb2UJg/exec';
+
+const classSelect = document.getElementById('classSelect');
+const loadBtn = document.getElementById('loadBtn');
+const studentList = document.getElementById('studentList');
+const saveBtn = document.getElementById('saveBtn');
+const attendanceDate = document.getElementById('attendanceDate');
 </html>
