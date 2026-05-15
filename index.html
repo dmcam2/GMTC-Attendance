@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Musical Theatre Attendance</title>
 
   <style>
@@ -64,4 +64,243 @@
       margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .student-name {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .status-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .status-btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+    }
+
+    .present {
+      background: #43a047;
+      color: white;
+    }
+
+    .absent {
+      background: #e53935;
+      color: white;
+    }
+
+    .late {
+      background: #fb8c00;
+      color: white;
+    }
+
+    .selected {
+      outline: 3px solid black;
+    }
+
+    #saveBtn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px;
+      font-size: 18px;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 700px) {
+      .student-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .status-buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <h1>Musical Theatre Attendance</h1>
+    <p>Roll Marking System</p>
+  </header>
+
+  <div class="top-controls">
+
+    <select id="classSelect">
+      <option value="">Select Class</option>
+    </select>
+
+    <input type="date" id="attendanceDate">
+
+    <button id="loadBtn">Load Roll</button>
+
+  </div>
+
+  <div id="studentList"></div>
+
+  <button id="saveBtn">Save Attendance</button>
+
+  <div id="message"></div>
+
+</div>
+
+<script>
+
+const API_URL = 'https://script.google.com/macros/s/AKfycbxkMD2_X2aT-8XNHvQlM_sX_HMJ6vcz4bZMqC0W8WAv6_UYh2XAy_WQC6sBsbktogxM/exec';
+
+const classSelect = document.getElementById('classSelect');
+const loadBtn = document.getElementById('loadBtn');
+const studentList = document.getElementById('studentList');
+const saveBtn = document.getElementById('saveBtn');
+const attendanceDate = document.getElementById('attendanceDate');
+const message = document.getElementById('message');
+
+let attendanceData = [];
+
+attendanceDate.valueAsDate = new Date();
+
+async function loadClasses() {
+
+  const response = await fetch(`${API_URL}?action=getClasses`);
+  const classes = await response.json();
+
+  classes.forEach(className => {
+
+    const option = document.createElement('option');
+    option.value = className;
+    option.textContent = className;
+
+    classSelect.appendChild(option);
+
+  });
+
+}
+
+async function loadStudents() {
+
+  const className = classSelect.value;
+
+  if (!className) {
+    alert('Please select a class');
+    return;
+  }
+
+  const response = await fetch(
+    `${API_URL}?action=getStudents&className=${encodeURIComponent(className)}`
+  );
+
+  const students = await response.json();
+
+  attendanceData = students.map(student => ({
+    name: `${student.firstName} ${student.lastName}`,
+    status: 'Present'
+  }));
+
+  renderStudents();
+
+}
+
+function renderStudents() {
+
+  studentList.innerHTML = '';
+
+  attendanceData.forEach(student => {
+
+    const card = document.createElement('div');
+    card.className = 'student-card';
+
+    card.innerHTML = `
+      <div class="student-name">${student.name}</div>
+
+      <div class="status-buttons">
+        <button class="status-btn present selected">P</button>
+        <button class="status-btn absent">A</button>
+        <button class="status-btn late">L</button>
+      </div>
+    `;
+
+    const buttons = card.querySelectorAll('.status-btn');
+
+    buttons.forEach(button => {
+
+      button.addEventListener('click', () => {
+
+        buttons.forEach(btn => btn.classList.remove('selected'));
+
+        button.classList.add('selected');
+
+        if (button.textContent === 'P') {
+          student.status = 'Present';
+        }
+
+        if (button.textContent === 'A') {
+          student.status = 'Absent';
+        }
+
+        if (button.textContent === 'L') {
+          student.status = 'Late';
+        }
+
+      });
+
+    });
+
+    studentList.appendChild(card);
+
+  });
+
+}
+
+async function saveAttendance() {
+
+  if (attendanceData.length === 0) {
+    alert('Please load a class first');
+    return;
+  }
+
+  const payload = {
+    action: 'saveAttendance',
+    className: classSelect.value,
+    date: attendanceDate.value,
+    attendance: attendanceData
+  };
+
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload)
+  });
+
+  const result = await response.json();
+
+  if (result.success) {
+    message.textContent = 'Attendance saved successfully';
+  } else {
+    message.textContent = 'Error saving attendance';
+  }
+
+}
+
+loadBtn.addEventListener('click', loadStudents);
+saveBtn.addEventListener('click', saveAttendance);
+
+loadClasses();
+
+</script>
+
+</body>
 </html>
