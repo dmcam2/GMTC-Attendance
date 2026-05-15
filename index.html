@@ -1,238 +1,59 @@
 <!DOCTYPE html>
-<html lang="eng">
-<head>
-  <title>Roll Marking System</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      font-family: Arial;
-      margin: 12px;
-      background: #f5f5f5;
-    }
+        button.classList.add('selected');
 
-    h2 {
-      margin: 10px 0;
-    }
+        if (button.textContent === 'P') {
+          student.status = 'Present';
+        }
 
-    select {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
+        if (button.textContent === 'A') {
+          student.status = 'Absent';
+        }
 
-    .student {
-      background: white;
-      padding: 14px;
-      margin-bottom: 10px;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        if (button.textContent === 'L') {
+          student.status = 'Late';
+        }
 
-    .btn {
-      padding: 10px 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-    }
+      });
 
-    .present { background: #2ecc71; color: white; }
-    .absent { background: #e74c3c; color: white; }
-
-    .container {
-      padding-bottom: 100px;
-    }
-
-    .sticky {
-      position: sticky;
-      bottom: 0;
-      background: white;
-      padding: 12px;
-    }
-
-    .submit {
-      width: 100%;
-      padding: 16px;
-      font-size: 18px;
-      background: #3498db;
-      color: white;
-      border: none;
-      border-radius: 12px;
-    }
-
-    /* POPUP */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-
-    .modal {
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
-      text-align: center;
-      width: 80%;
-      max-width: 320px;
-    }
-
-    .modal button {
-      margin-top: 15px;
-      padding: 12px 16px;
-      border: none;
-      border-radius: 10px;
-      background: #2ecc71;
-      color: white;
-    }
-  </style>
-</head>
-
-<body>
-
-<h2>Roll Marking</h2>
-
-<label>Session</label>
-<select id="sessionSelect"></select>
-
-<div class="container" id="studentList"></div>
-
-<div class="sticky">
-  <button class="submit" onclick="submitAttendance()">Submit Attendance</button>
-</div>
-
-<p id="response"></p>
-
-<!-- SUCCESS POPUP -->
-<div class="overlay" id="successOverlay">
-  <div class="modal">
-    <h2>✔ Submitted</h2>
-    <p>Attendance saved successfully.</p>
-    <button onclick="closeModal()">OK</button>
-  </div>
-</div>
-
-<script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbw2mwIb2qx5I1IbmGBuhpbXqyHpVgzLEz2xO-gghQttAC8vyldpmgV3lRBzuTghcH7x/exec";
-
-let sessions = [];
-let selectedSession = null;
-let attendance = {};
-
-// LOAD SESSIONS
-fetch(scriptURL)
-  .then(res => res.json())
-  .then(data => {
-    sessions = data;
-
-    const select = document.getElementById("sessionSelect");
-
-    sessions.forEach((s, i) => {
-      const opt = document.createElement("option");
-      opt.value = i;
-      opt.textContent =
-        `${s.date} - ${s.day} - ${s.level} (${s.activity})`;
-      select.appendChild(opt);
     });
 
-    select.addEventListener("change", loadStudents);
-    loadStudents();
-  })
-  .catch(err => {
-    document.getElementById("response").innerText =
-      "Failed to load sessions.";
-    console.error(err);
-  });
-
-// LOAD STUDENTS
-function loadStudents() {
-  const i = document.getElementById("sessionSelect").value;
-  selectedSession = sessions[i];
-
-  const container = document.getElementById("studentList");
-  container.innerHTML = "";
-  attendance = {};
-
-  selectedSession.students.forEach(name => {
-    attendance[name] = "Present";
-
-    const div = document.createElement("div");
-    div.className = "student";
-
-    div.innerHTML = `
-      <strong>${name}</strong>
-      <div>
-        <button class="btn present"
-          onclick="mark('${name}','Present')">✔</button>
-
-        <button class="btn absent"
-          onclick="mark('${name}','Absent')">✖</button>
-      </div>
-    `;
-
-    container.appendChild(div);
+    studentList.appendChild(card);
   });
 }
 
-// MARK ATTENDANCE
-function mark(name, status) {
-  attendance[name] = status;
-}
+async function saveAttendance() {
 
-// SUBMIT
-function submitAttendance() {
-  const records = Object.keys(attendance).map(name => ({
-    name,
-    status: attendance[name]
-  }));
+  if (attendanceData.length === 0) {
+    alert('Please load a class first');
+    return;
+  }
 
-  fetch(scriptURL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      date: selectedSession.date,
-      day: selectedSession.day,
-      level: selectedSession.level,
-      activity: selectedSession.activity,
-      records
-    })
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.result === "success") {
-      showModal();
-    } else {
-      document.getElementById("response").innerText =
-        data.message || "Error submitting";
-    }
-  })
-  .catch(err => {
-    document.getElementById("response").innerText =
-      "Submission failed.";
-    console.error(err);
+  const payload = {
+    action: 'saveAttendance',
+    className: classSelect.value,
+    date: attendanceDate.value,
+    attendance: attendanceData
+  };
+
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload)
   });
+
+  const result = await response.json();
+
+  if (result.success) {
+    message.textContent = 'Attendance saved successfully';
+  } else {
+    message.textContent = 'Error saving attendance';
+  }
 }
 
-// MODAL
-function showModal() {
-  document.getElementById("successOverlay").style.display = "flex";
-}
+loadBtn.addEventListener('click', loadStudents);
+saveBtn.addEventListener('click', saveAttendance);
 
-function closeModal() {
-  document.getElementById("successOverlay").style.display = "none";
-  loadStudents();
-}
+loadClasses();
 </script>
 
 </body>
